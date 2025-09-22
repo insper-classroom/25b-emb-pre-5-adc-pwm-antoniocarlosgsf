@@ -21,9 +21,7 @@ const float conversion_factor = 3.3f / (1 << 12);
  */
 volatile bool adc_tick      = false; // Sinal para ler o ADC
 volatile bool led_tick      = false; // Sinal para alternar o LED
-volatile bool led_piscando  = false; // Se há led piscando
-volatile int  period        = 0;
-volatile bool led_on        = false; // Estado atual do LED
+
 
 repeating_timer_t adc_timer;
 repeating_timer_t led_timer;
@@ -89,7 +87,6 @@ int main() {
 
                     if (led_piscando) {
                         cancel_repeating_timer(&led_timer);
-                        led_piscando = false;
                     }
 
                     led_on = false;

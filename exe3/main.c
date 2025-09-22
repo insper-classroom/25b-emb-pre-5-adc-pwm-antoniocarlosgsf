@@ -38,11 +38,10 @@ void process_task(void *p) {
                 vetor[preenchidos] = data;
                 sum += data;
                 preenchidos++;
-
-                if (preenchidos == 5) {
-                    int media = (sum) / 5; 
-                    printf("%d \n", media);
-                }
+                
+                int media = (sum) / 5; 
+                printf("%d \n", media);
+        
             } else {
                 sum -= vetor[0];
                 for (int i = 0; i < 4; i++){

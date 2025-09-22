@@ -26,13 +26,31 @@ void data_task(void *p) {
 void process_task(void *p) {
     int data = 0;
 
+    int vetor[5] = {0, 0, 0, 0, 0};
+    int preenchidos = 0;
+    int sum = 0;
+
     while (true) {
         if (xQueueReceive(xQueueData, &data, 100)) {
             // implementar filtro aqui!
 
+            if (preenchidos < 5) {
+                vetor[0] = data;
+                sum += data;
+                preenchidos++;
+            } else {
+                sum -= vetor[0];
+                for (int i = 0; i < 4; i++){
+                    vetor[i] = vetor[i+1];
+                }
 
+                vetor[4] = data;
+                sum += data;
 
-
+                int media = sum / 5;
+                printf("%d \n", media);
+            }
+            
             // deixar esse delay!
             vTaskDelay(pdMS_TO_TICKS(50));
         }

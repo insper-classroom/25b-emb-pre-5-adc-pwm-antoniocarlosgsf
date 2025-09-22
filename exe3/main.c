@@ -35,9 +35,14 @@ void process_task(void *p) {
             // implementar filtro aqui!
 
             if (preenchidos < 5) {
-                vetor[0] = data;
+                vetor[preenchidos] = data;
                 sum += data;
                 preenchidos++;
+
+                if (preenchidos == 5) {
+                    int media = (sum) / 5; 
+                    printf("%d \n", media);
+                }
             } else {
                 sum -= vetor[0];
                 for (int i = 0; i < 4; i++){
@@ -50,7 +55,7 @@ void process_task(void *p) {
                 int media = sum / 5;
                 printf("%d \n", media);
             }
-            
+
             // deixar esse delay!
             vTaskDelay(pdMS_TO_TICKS(50));
         }

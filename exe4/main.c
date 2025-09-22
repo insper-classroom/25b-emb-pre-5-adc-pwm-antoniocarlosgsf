@@ -41,38 +41,40 @@ bool timer_led_callback(repeating_timer_t *rt) {
 }
 
 int main() {
-    // stdio_init_all(); // evite printf no teste/simulação
+    stdio_init_all();
 
     gpio_init(PIN_LED_B);
     gpio_set_dir(PIN_LED_B, GPIO_OUT);
     gpio_put(PIN_LED_B, 0);
-    led_on = false;
 
     adc_init();
     adc_gpio_init(ADC_PIN);
 
-    // Dispara um "tick" de ADC a cada 25 ms
+    // ---- mover para escopo local (sem volatile) ----
+    bool led_piscando = false;   // Se há LED piscando
+    int  period       = 0;       // período atual (ms)
+    bool led_on       = false;   // estado atual do LED
+    // ------------------------------------------------
+
     add_repeating_timer_ms(25, timer_adc_callback, NULL, &adc_timer);
 
     while (1) {
-        // 1) Leitura do ADC e definição do período
         if (adc_tick) {
             adc_tick = false;
 
-            adc_select_input(2);                 
+            adc_select_input(2);
             uint16_t result = adc_read();
             float v = result * conversion_factor;
 
             uint32_t new_period;
             if (v < 1.0f)      new_period = 0;
-            else if (v < 2.0f) new_period = 300;
+            else if (v < 2.0f) new_period = 300;   // conforme enunciado
             else               new_period = 500;
 
-            if (new_period != (uint32_t)period) {         
+            if (new_period != (uint32_t)period) {
                 period = (int)new_period;
 
                 if (period == 0) {
-                    // OFF: cancela pisca e apaga LED
                     if (led_piscando) {
                         cancel_repeating_timer(&led_timer);
                         led_piscando = false;
@@ -82,7 +84,6 @@ int main() {
                         gpio_put(PIN_LED_B, 0);
                     }
                 } else {
-                    // Liga/ajusta o pisca com metade do período (duty ~50%)
                     uint32_t half = (uint32_t)period / 2;
                     if (half == 0) half = 1;
 
@@ -91,7 +92,6 @@ int main() {
                         led_piscando = false;
                     }
 
-                    // Reinicia fase: começa apagado
                     led_on = false;
                     gpio_put(PIN_LED_B, 0);
 
@@ -101,8 +101,7 @@ int main() {
             }
         }
 
-        // 2) Alternância do LED quando o timer de pisca pedir
-        if (led_tick) {                                  
+        if (led_tick) {
             led_tick = false;
 
             if (period == 0) {
